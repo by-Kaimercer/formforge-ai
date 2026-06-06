@@ -25,7 +25,7 @@ function Field({ label, children, optional }: { label: string; children: React.R
   );
 }
 
-const inputCls = "w-full bg-elevated border border-border rounded-lg px-4 py-3 text-text-primary font-body text-base placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/10 transition-colors";
+const inputCls = "w-full bg-white border border-[#e5e7eb] rounded-lg px-4 py-3 text-[#111111] font-body text-base placeholder:text-[#9ca3af] focus:border-[#111111] focus:outline-none focus:ring-2 focus:ring-black/5 transition-colors";
 const selectCls = inputCls;
 
 /* ── Step 1 ─── */
@@ -44,8 +44,8 @@ function Step1({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         </Field>
       </div>
       <div className="flex items-center gap-2 mb-2">
-        <button onClick={() => setMetric(true)} className={`font-mono text-xs px-3 py-1.5 rounded ${metric ? "bg-accent text-black" : "bg-elevated text-text-secondary"}`}>Metric</button>
-        <button onClick={() => setMetric(false)} className={`font-mono text-xs px-3 py-1.5 rounded ${!metric ? "bg-accent text-black" : "bg-elevated text-text-secondary"}`}>Imperial</button>
+        <button onClick={() => setMetric(true)} className={`font-mono text-xs px-3 py-1.5 rounded ${metric ? "bg-[#111111] text-white" : "bg-[#f8f9fa] text-[#6b7280]"}`}>Metric</button>
+        <button onClick={() => setMetric(false)} className={`font-mono text-xs px-3 py-1.5 rounded ${!metric ? "bg-[#111111] text-white" : "bg-[#f8f9fa] text-[#6b7280]"}`}>Imperial</button>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <Field label={metric ? "Height (cm)" : "Height (in)"}>
@@ -67,7 +67,7 @@ function Step1({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
             <button key={inj.id} onClick={() => {
               const has = p.injuries.includes(inj.id);
               u({ injuries: has ? p.injuries.filter(x => x !== inj.id) : [...p.injuries, inj.id] });
-            }} className={`px-3 py-2 rounded-lg text-sm border transition-colors ${p.injuries.includes(inj.id) ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary hover:border-border-hover"}`}>
+            }} className={`px-3 py-2 rounded-lg text-sm border transition-colors ${p.injuries.includes(inj.id) ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary hover:border-border-hover"}`}>
               {inj.label}
             </button>
           ))}
@@ -101,7 +101,7 @@ function Step2({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {SESSION_DURATION_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ session_duration: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.session_duration === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary hover:border-border-hover"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.session_duration === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary hover:border-border-hover"}`}>
               {o.label}
             </button>
           ))}
@@ -111,9 +111,9 @@ function Step2({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="grid grid-cols-2 gap-3">
           {EQUIPMENT_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ equipment: o.value })}
-              className={`p-4 rounded-lg border text-left transition-colors ${p.equipment === o.value ? "border-accent bg-accent-dim" : "border-border hover:border-border-hover"}`}>
+              className={`p-4 rounded-lg border text-left transition-colors ${p.equipment === o.value ? "border-[#111111] bg-[#f8f9fa]" : "border-border hover:border-border-hover"}`}>
               <span className="text-xl mb-1 block">{o.icon}</span>
-              <span className={`text-sm ${p.equipment === o.value ? "text-accent" : "text-text-secondary"}`}>{o.label}</span>
+              <span className={`text-sm ${p.equipment === o.value ? "text-[#111111] font-semibold" : "text-text-secondary"}`}>{o.label}</span>
             </button>
           ))}
         </div>
@@ -134,9 +134,9 @@ function Step3({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {GOAL_OPTIONS.map(g => (
             <button key={g.value} onClick={() => u({ goal_primary: g.value })}
-              className={`p-4 rounded-lg border text-left transition-all ${p.goal_primary === g.value ? "border-accent bg-accent-dim shadow-accent-glow-sm" : "border-border hover:border-border-hover"}`}>
+              className={`p-4 rounded-lg border text-left transition-all ${p.goal_primary === g.value ? "border-[#111111] bg-[#f8f9fa] shadow-card" : "border-border hover:border-border-hover"}`}>
               <span className="text-2xl mb-2 block">{g.icon}</span>
-              <span className={`text-sm font-medium block ${p.goal_primary === g.value ? "text-accent" : "text-text-primary"}`}>{g.label}</span>
+              <span className={`text-sm font-medium block ${p.goal_primary === g.value ? "text-[#111111] font-semibold" : "text-text-primary"}`}>{g.label}</span>
               <span className="text-xs text-text-muted block mt-1">{g.desc}</span>
             </button>
           ))}
@@ -156,7 +156,7 @@ function Step3({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {TIMELINE_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ timeline: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.timeline === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary hover:border-border-hover"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.timeline === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary hover:border-border-hover"}`}>
               {o.label}
             </button>
           ))}
@@ -174,7 +174,7 @@ function Step4({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {SLEEP_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ sleep: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.sleep === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.sleep === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary"}`}>
               {o.label}
             </button>
           ))}
@@ -188,7 +188,7 @@ function Step4({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {DIET_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ diet: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.diet === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.diet === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary"}`}>
               {o.label}
             </button>
           ))}
@@ -198,7 +198,7 @@ function Step4({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {PROTEIN_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ protein_intake: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.protein_intake === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.protein_intake === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary"}`}>
               {o.label}
             </button>
           ))}
@@ -208,7 +208,7 @@ function Step4({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {CARDIO_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ cardio: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.cardio === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.cardio === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary"}`}>
               {o.label}
             </button>
           ))}
@@ -227,7 +227,7 @@ function Step5({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-2">
           {SPLIT_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ preferred_split: o.value })}
-              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.preferred_split === o.value ? "border-accent text-accent bg-accent-dim" : "border-border text-text-secondary"}`}>
+              className={`px-4 py-2.5 rounded-lg text-sm border transition-colors ${p.preferred_split === o.value ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-secondary"}`}>
               {o.label}
             </button>
           ))}
@@ -237,7 +237,7 @@ function Step5({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto p-1">
           {COMMON_EXERCISES.map(ex => (
             <button key={ex} onClick={() => u({ favorite_exercises: toggleArr(p.favorite_exercises, ex) })}
-              className={`px-2.5 py-1.5 rounded text-xs border transition-colors ${p.favorite_exercises.includes(ex) ? "border-accent text-accent bg-accent-dim" : "border-border text-text-muted hover:text-text-secondary"}`}>
+              className={`px-2.5 py-1.5 rounded text-xs border transition-colors ${p.favorite_exercises.includes(ex) ? "border-[#111111] text-[#111111] bg-[#f8f9fa]" : "border-border text-text-muted hover:text-text-secondary"}`}>
               {ex}
             </button>
           ))}
@@ -268,8 +268,8 @@ function Step5({ p, u }: { p: Profile; u: (k: Partial<Profile>) => void }) {
         <div className="space-y-2">
           {INTENSITY_OPTIONS.map(o => (
             <button key={o.value} onClick={() => u({ intensity_pref: o.value })}
-              className={`w-full p-4 rounded-lg border text-left transition-colors ${p.intensity_pref === o.value ? "border-accent bg-accent-dim" : "border-border hover:border-border-hover"}`}>
-              <span className={`text-sm font-medium block ${p.intensity_pref === o.value ? "text-accent" : "text-text-primary"}`}>{o.label}</span>
+              className={`w-full p-4 rounded-lg border text-left transition-colors ${p.intensity_pref === o.value ? "border-[#111111] bg-[#f8f9fa]" : "border-border hover:border-border-hover"}`}>
+              <span className={`text-sm font-medium block ${p.intensity_pref === o.value ? "text-[#111111] font-semibold" : "text-text-primary"}`}>{o.label}</span>
               <span className="text-xs text-text-muted">{o.desc}</span>
             </button>
           ))}
@@ -293,7 +293,7 @@ function Review({ p }: { p: Profile }) {
       <p className="text-text-secondary text-sm mb-4">Review your profile before generating your program.</p>
       {sections.map((s, i) => (
         <Card key={i} hover={false} className="p-4">
-          <h4 className="font-heading font-bold text-sm uppercase text-accent mb-2">{s.title}</h4>
+          <h4 className="font-display font-semibold text-sm text-[#111111] mb-2">{s.title}</h4>
           <div className="space-y-1">{s.items.map((item, j) => <p key={j} className="text-sm text-text-secondary">{item}</p>)}</div>
         </Card>
       ))}
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
 
       {/* Content */}
       <main className="flex-1 max-w-2xl mx-auto px-6 py-8 w-full">
-        <h2 className="font-heading font-bold text-2xl uppercase mb-2">
+        <h2 className="font-display font-bold text-2xl tracking-tight mb-2">
           {isReview ? "Review Your Profile" : STEPS[step]}
         </h2>
         <p className="text-text-muted text-sm mb-8">

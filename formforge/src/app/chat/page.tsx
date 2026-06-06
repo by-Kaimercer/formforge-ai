@@ -1,18 +1,52 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Button, Card } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { CHAT_STARTERS } from "@/lib/constants";
-import { ChatMessage } from "@/lib/types";
+import { ChatMessage, Profile, ProgramJSON } from "@/lib/types";
 import { Send, Zap, User } from "lucide-react";
+import { createClient } from "@/lib/supabase-browser";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [activeProgram, setActiveProgram] = useState<ProgramJSON | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+
+      const { data: programRow } = await supabase
+        .from("programs")
+        .select("program_json")
+        .eq("user_id", data.user.id)
+        .eq("is_active", true)
+        .single();
+
+      if (programRow) {
+        setActiveProgram(programRow.program_json as ProgramJSON);
+      } else {
+        const stored = sessionStorage.getItem("ff_program");
+        if (stored) setActiveProgram(JSON.parse(stored));
+      }
+
+      const { data: profileRow } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", data.user.id)
+        .single();
+
+      if (profileRow) setProfile(profileRow as Profile);
+    });
+  }, []);
 
   const send = async (text: string) => {
     if (!text.trim()) return;
@@ -26,7 +60,11 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({
+          messages: newMessages,
+          profile,
+          program: activeProgram,
+        }),
       });
       const data = await res.json();
       setMessages(prev => [...prev, { role: "assistant", content: data.message || "Sorry, I couldn't process that." }]);
@@ -39,13 +77,15 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-base flex flex-col">
       <Navbar />
-      <main className="flex-1 flex flex-col max-w-3xl mx-auto w-full pt-16 pb-20 md:pb-4">
+      <main className="flex-1 flex flex-col max-w-3xl mx-auto w-full pt-16 pb-20 md:pb-4 md:pl-72">
         {/* Header */}
         <div className="px-4 md:px-6 py-4 border-b border-border">
           <h1 className="font-heading font-[800] text-xl uppercase flex items-center gap-2">
             <Zap className="w-5 h-5 text-accent" />AI Coach
           </h1>
-          <p className="text-text-muted text-xs">Ask anything about your program</p>
+          <p className="text-text-muted text-xs">
+            {activeProgram ? `Coaching for: ${activeProgram.programName}` : "Ask anything about your program"}
+          </p>
         </div>
 
         {/* Messages */}
@@ -61,8 +101,11 @@ export default function ChatPage() {
               </p>
               <div className="flex flex-wrap gap-2 justify-center max-w-lg">
                 {CHAT_STARTERS.map((q, i) => (
-                  <button key={i} onClick={() => send(q)}
-                    className="px-3 py-2 rounded-lg text-xs border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors">
+                  <button
+                    key={i}
+                    onClick={() => send(q)}
+                    className="px-3 py-2 rounded-lg text-xs border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors"
+                  >
                     {q}
                   </button>
                 ))}
@@ -77,11 +120,13 @@ export default function ChatPage() {
                   <Zap className="w-4 h-4 text-accent" />
                 </div>
               )}
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                msg.role === "user"
-                  ? "bg-accent text-black rounded-br-md"
-                  : "bg-card border border-border text-text-secondary rounded-bl-md"
-              }`}>
+              <div
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-[#111111] text-white rounded-br-md"
+                    : "bg-card border border-border text-text-secondary rounded-bl-md"
+                }`}
+              >
                 {msg.content}
               </div>
               {msg.role === "user" && (
@@ -112,10 +157,13 @@ export default function ChatPage() {
         {/* Input */}
         <div className="px-4 md:px-6 py-3 border-t border-border bg-base">
           <form onSubmit={e => { e.preventDefault(); send(input); }} className="flex gap-2">
-            <input value={input} onChange={e => setInput(e.target.value)}
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
               placeholder="Ask your coach anything..."
               className="flex-1 bg-elevated border border-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/10"
-              disabled={loading} />
+              disabled={loading}
+            />
             <Button type="submit" disabled={loading || !input.trim()} className="px-4">
               <Send className="w-4 h-4" />
             </Button>

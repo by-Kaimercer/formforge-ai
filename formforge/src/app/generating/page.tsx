@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -22,23 +23,25 @@ export default function GeneratingPage() {
       const data = await res.json();
       if (data.success) {
         sessionStorage.setItem("ff_program", JSON.stringify(data.program));
+        if (data.programId && data.programId !== "demo") {
+          sessionStorage.setItem("ff_program_id", data.programId);
+        }
         setProgress(100);
         setTimeout(() => router.push(`/program/${data.programId || "demo"}`), 500);
+      } else if (data.error === "FREE_LIMIT_REACHED") {
+        setProgress(100);
+        setTimeout(() => router.push("/settings?upgrade=limit"), 500);
       } else {
         throw new Error(data.error);
       }
     } catch {
-      // Fallback: still redirect with demo data
       setProgress(100);
       setTimeout(() => router.push("/program/demo"), 500);
     }
   }, [router]);
 
-  useEffect(() => {
-    generate();
-  }, [generate]);
+  useEffect(() => { generate(); }, [generate]);
 
-  // Rotate messages
   useEffect(() => {
     const interval = setInterval(() => {
       setMsgIndex(i => (i + 1) % LOADING_MESSAGES.length);
@@ -46,7 +49,6 @@ export default function GeneratingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Animate progress
   useEffect(() => {
     if (progress >= 100) return;
     const interval = setInterval(() => {
@@ -56,26 +58,26 @@ export default function GeneratingPage() {
   }, [progress]);
 
   return (
-    <div className="min-h-screen bg-base flex flex-col items-center justify-center relative">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center relative">
       {/* Top progress bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-elevated">
-        <div className="h-full bg-accent transition-all duration-300" style={{ width: `${progress}%` }} />
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#e5e7eb]">
+        <div className="h-full bg-[#111111] transition-all duration-300" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Center content */}
       <div className="text-center px-6">
         {/* Pulsing logo */}
-        <div className="w-20 h-20 mx-auto mb-10 rounded-2xl bg-accent-dim border border-accent/30 flex items-center justify-center animate-pulse">
-          <Zap className="w-10 h-10 text-accent" />
+        <div className="w-20 h-20 mx-auto mb-10 rounded-2xl bg-[#f5f5f5] border border-[#e5e7eb] shadow-card flex items-center justify-center animate-pulse">
+          <Zap className="w-10 h-10 text-[#111111]" />
         </div>
 
-        <h1 className="font-heading font-[800] text-3xl md:text-5xl uppercase mb-4 text-text-primary">
+        <h1 className="font-display font-bold text-display-lg tracking-tight text-[#111111] mb-4">
           Building Your Program
         </h1>
 
         {/* Rotating message */}
         <div className="h-8 flex items-center justify-center">
-          <p key={msgIndex} className="text-text-secondary text-sm md:text-base animate-fade-in-up font-body">
+          <p key={msgIndex} className="text-[#6b7280] text-sm md:text-base animate-fade-in-up font-body">
             {LOADING_MESSAGES[msgIndex]}
           </p>
         </div>
@@ -83,13 +85,13 @@ export default function GeneratingPage() {
         {/* Dots */}
         <div className="flex items-center justify-center gap-1.5 mt-8">
           {LOADING_MESSAGES.map((_, i) => (
-            <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${i === msgIndex ? "bg-accent" : "bg-border"}`} />
+            <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${i === msgIndex ? "bg-[#111111]" : "bg-[#e5e7eb]"}`} />
           ))}
         </div>
       </div>
 
-      {/* Bottom subtle text */}
-      <p className="absolute bottom-8 text-text-muted text-xs font-mono">
+      {/* Bottom label */}
+      <p className="absolute bottom-8 text-[#9ca3af] text-xs font-mono">
         FORMFORGE ENGINE v1.0
       </p>
     </div>

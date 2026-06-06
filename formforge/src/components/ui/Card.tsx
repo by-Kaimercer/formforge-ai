@@ -12,7 +12,11 @@ export default function Card({ children, className = "", hover = true, onClick }
   return (
     <div
       onClick={onClick}
-      className={`bg-card border border-border rounded-card p-6 ${hover ? "transition-all duration-200 hover:border-accent hover:shadow-accent-glow-sm cursor-pointer" : ""} ${onClick ? "cursor-pointer" : ""} ${className}`}
+      className={`bg-card border border-border rounded-card p-6 shadow-card ${
+        hover
+          ? "transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer"
+          : ""
+      } ${onClick ? "cursor-pointer" : ""} ${className}`}
     >
       {children}
     </div>

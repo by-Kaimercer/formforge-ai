@@ -9,12 +9,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-const base = "inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider rounded-lg transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base";
+const base = "inline-flex items-center justify-center font-body font-semibold rounded-lg transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-black px-7 py-3.5 text-sm hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]",
-  secondary: "border border-accent text-accent bg-transparent px-7 py-3.5 text-sm hover:bg-accent-dim",
-  ghost: "text-text-secondary px-4 py-2 text-sm hover:text-text-primary",
+  primary:   "bg-[#111111] text-white px-5 py-2.5 text-sm hover:bg-[#242424] active:bg-[#111111] shadow-sm",
+  secondary: "bg-white text-[#111111] border border-[#e5e7eb] px-5 py-2.5 text-sm hover:bg-[#f8f9fa] shadow-sm",
+  ghost:     "text-[#111111] px-4 py-2 text-sm hover:underline",
 };
 
 export default function Button({ variant = "primary", loading, children, className = "", ...props }: ButtonProps) {

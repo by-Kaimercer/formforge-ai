@@ -1,9 +1,12 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { Button, Card, Badge, getMuscleVariant } from "@/components/ui";
 import { MOCK_PROGRAM } from "@/lib/mock-data";
 import { ProgramJSON, Exercise } from "@/lib/types";
+import { createClient } from "@/lib/supabase-browser";
 import { ChevronDown, ChevronUp, Clock, Share2, Download, RefreshCw, Zap, AlertTriangle } from "lucide-react";
 
 function RirBadge({ rir }: { rir: string }) {
@@ -15,7 +18,7 @@ function RirBadge({ rir }: { rir: string }) {
 function ExerciseRow({ ex }: { ex: Exercise }) {
   const variant = getMuscleVariant(ex.muscleGroup);
   return (
-    <div className="group flex flex-col md:flex-row md:items-center gap-3 md:gap-0 py-3.5 px-4 border-l-[3px] border-transparent hover:border-accent transition-colors even:bg-white/[0.02]">
+    <div className="group flex flex-col md:flex-row md:items-center gap-3 md:gap-0 py-3.5 px-4 border-l-[3px] border-transparent hover:border-[#111111] transition-colors even:bg-[#f8f9fa]">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-mono text-xs text-text-muted w-5">{ex.order}.</span>
@@ -66,13 +69,50 @@ function DayAccordion({ day, defaultOpen }: { day: { dayLabel: string; focus: st
 }
 
 export default function ProgramPage() {
+  const params = useParams();
+  const id = (params?.id as string) || "demo";
   const [program, setProgram] = useState<ProgramJSON | null>(null);
   const [activeWeek, setActiveWeek] = useState(0);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("ff_program");
-    setProgram(stored ? JSON.parse(stored) : MOCK_PROGRAM);
-  }, []);
+    let cancelled = false;
+
+    async function load() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        // A real program id → load that specific program (supports shared links).
+        // "demo"/no id → fall back to the user's active program.
+        const query =
+          id && id !== "demo"
+            ? supabase.from("programs").select("program_json").eq("id", id).single()
+            : supabase
+                .from("programs")
+                .select("program_json")
+                .eq("user_id", user.id)
+                .eq("is_active", true)
+                .single();
+
+        const { data } = await query;
+        if (!cancelled && data?.program_json) {
+          setProgram(data.program_json as ProgramJSON);
+          return;
+        }
+      }
+
+      // Unauthenticated or no DB match → use the in-session program or mock.
+      const stored = sessionStorage.getItem("ff_program");
+      if (!cancelled) setProgram(stored ? JSON.parse(stored) : MOCK_PROGRAM);
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   if (!program) return <div className="min-h-screen bg-base flex items-center justify-center"><div className="animate-pulse text-accent font-mono">Loading...</div></div>;
 
@@ -81,10 +121,10 @@ export default function ProgramPage() {
   return (
     <div className="min-h-screen bg-base">
       <Navbar />
-      <main className="max-w-content mx-auto px-4 md:px-6 pt-20 md:pt-20 pb-24 md:pb-12">
+      <main className="max-w-content mx-auto px-4 md:px-6 pt-20 md:pt-20 pb-24 md:pb-12 md:pl-72">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-heading font-[800] text-2xl md:text-4xl uppercase mb-3">{program.programName}</h1>
+          <h1 className="font-display font-bold text-2xl md:text-4xl tracking-tight mb-3">{program.programName}</h1>
           <div className="flex flex-wrap gap-2 mb-4">
             <Badge>{program.split}</Badge>
             <Badge>{program.durationWeeks} WEEKS</Badge>
@@ -94,17 +134,17 @@ export default function ProgramPage() {
         </div>
 
         {/* Coach Summary */}
-        <Card hover={false} className="mb-8 border-accent/30">
+        <div className="mb-8 border-l-4 border-l-[#111111] bg-[#f8f9fa] rounded-r-lg p-5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-accent-dim border border-accent/30 flex items-center justify-center shrink-0">
-              <Zap className="w-5 h-5 text-accent" />
+            <div className="w-10 h-10 rounded-full bg-white border border-[#e5e7eb] flex items-center justify-center shrink-0">
+              <Zap className="w-5 h-5 text-[#111111]" />
             </div>
             <div>
-              <p className="font-heading font-bold text-sm uppercase text-accent mb-1">Coach Summary</p>
-              <p className="text-sm text-text-secondary leading-relaxed">{program.coachSummary}</p>
+              <p className="font-display font-semibold text-sm text-[#111111] mb-1">Coach Summary</p>
+              <p className="text-sm text-[#374151] leading-relaxed">{program.coachSummary}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2 mb-6">
@@ -119,7 +159,7 @@ export default function ProgramPage() {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {program.weeks.map((w, i) => (
             <button key={i} onClick={() => setActiveWeek(i)}
-              className={`shrink-0 px-4 py-2 rounded-lg font-mono text-xs uppercase transition-colors ${activeWeek === i ? "bg-accent text-black" : "bg-elevated text-text-secondary hover:text-text-primary border border-border"}`}>
+              className={`shrink-0 px-4 py-2 rounded-lg font-mono text-xs uppercase transition-colors ${activeWeek === i ? "bg-[#111111] text-white" : "bg-[#f8f9fa] text-[#6b7280] hover:text-[#111111] border border-[#e5e7eb]"}`}>
               Week {w.weekNumber}
             </button>
           ))}
@@ -143,19 +183,19 @@ export default function ProgramPage() {
 
         {/* Red flags */}
         {program.redFlags.length > 0 && (
-          <Card hover={false} className="mt-8 border-ff-red/30">
+          <div className="mt-8 border-l-4 border-l-[#ef4444] bg-[#ef4444]/5 rounded-r-lg p-5">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-ff-red shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-[#ef4444] shrink-0 mt-0.5" />
               <div>
-                <p className="font-heading font-bold text-sm uppercase text-ff-red mb-2">Watch For</p>
+                <p className="font-display font-semibold text-sm text-[#ef4444] mb-2">Watch For</p>
                 <ul className="space-y-1.5">
                   {program.redFlags.map((flag, i) => (
-                    <li key={i} className="text-sm text-text-secondary">• {flag}</li>
+                    <li key={i} className="text-sm text-[#374151]">• {flag}</li>
                   ))}
                 </ul>
               </div>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Protocols */}
@@ -165,9 +205,9 @@ export default function ProgramPage() {
             { title: "Nutrition", text: program.nutritionContext },
             { title: "Recovery", text: program.recoveryProtocol },
           ].map((item, i) => (
-            <Card key={i} hover={false}>
-              <h3 className="font-heading font-bold text-sm uppercase text-accent mb-2">{item.title}</h3>
-              <p className="text-xs text-text-secondary leading-relaxed">{item.text}</p>
+            <Card key={i} hover={false} className="bg-[#f5f5f5]">
+              <h3 className="font-display font-semibold text-sm text-[#111111] mb-2">{item.title}</h3>
+              <p className="text-xs text-[#374151] leading-relaxed">{item.text}</p>
             </Card>
           ))}
         </div>

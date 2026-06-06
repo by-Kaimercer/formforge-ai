@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const groqKey = process.env.GROQ_API_KEY;
+    const groqKey = process.env.OPENROUTER_API_KEY;
 
     if (!groqKey) {
       // Demo mode
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const { chatWithCoach } = await import("@/lib/groq");
     const { buildProfileContext, buildProgramContext } = await import("@/lib/rag");
-    const profileCtx = buildProfileContext(body.profile);
+    const profileCtx = body.profile ? buildProfileContext(body.profile) : "No profile provided";
     const programCtx = body.program ? buildProgramContext(body.program) : "No program loaded";
     const reply = await chatWithCoach(body.messages, profileCtx, programCtx);
     return NextResponse.json({ message: reply });

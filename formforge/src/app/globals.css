@@ -3,20 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #080808;
-  --bg-card: #111111;
-  --bg-elevated: #1A1A1A;
-  --border: #222222;
-  --border-hover: #333333;
-  --accent: #C8FF00;
-  --accent-dim: rgba(200,255,0,0.08);
-  --accent-glow: 0 0 30px rgba(200,255,0,0.2);
-  --text-primary: #F0F0F0;
-  --text-secondary: #888888;
-  --text-muted: #444444;
-  --red: #FF3B3B;
-  --blue: #3B82F6;
-  --white: #FFFFFF;
+  color-scheme: light;
+  --bg-base:        #ffffff;
+  --bg-card:        #f5f5f5;
+  --bg-elevated:    #f8f9fa;
+  --border:         #e5e7eb;
+  --border-hover:   #d1d5db;
+  --accent:         #111111;
+  --accent-dim:     rgba(17,17,17,0.06);
+  --accent-glow:    0 1px 2px rgba(0,0,0,0.05);
+  --text-primary:   #111111;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --red:            #ef4444;
+  --blue:           #3b82f6;
+  --white:          #ffffff;
 }
 
 * {
@@ -30,9 +31,9 @@ html {
 }
 
 body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-dm-sans), sans-serif;
+  background-color: #ffffff;
+  color: #111111;
+  font-family: var(--font-inter), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -44,22 +45,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: #f8f9fa;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
+  background: #d1d5db;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #9ca3af;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(200, 255, 0, 0.3);
-  color: var(--text-primary);
+  background: rgba(59, 130, 246, 0.15);
+  color: #111111;
 }
 
 /* Noise Texture Overlay */
@@ -70,7 +71,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.03;
+  opacity: 0.015;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -90,6 +91,14 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  .label-overline {
+    font-family: var(--font-inter), sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
 }
 
 /* Accordion animation */
@@ -107,6 +116,19 @@ body {
   opacity: 1;
 }
 
+/* Force light-mode colors on all form elements (prevents OS dark-mode override) */
+input,
+textarea,
+select {
+  color: #111111;
+  background-color: #ffffff;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
 /* Input number arrows hide */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -120,20 +142,20 @@ input[type="number"] {
 
 /* Focus visible */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid #111111;
   outline-offset: 2px;
 }
 
-/* Muscle group colors */
-.muscle-chest { color: #FF6B6B; background: rgba(255, 107, 107, 0.15); }
-.muscle-back { color: #4ECDC4; background: rgba(78, 205, 196, 0.15); }
-.muscle-legs { color: #FFE66D; background: rgba(255, 230, 109, 0.15); }
-.muscle-shoulders { color: #A78BFA; background: rgba(167, 139, 250, 0.15); }
-.muscle-arms { color: #F97316; background: rgba(249, 115, 22, 0.15); }
-.muscle-core { color: #6EE7B7; background: rgba(110, 231, 183, 0.15); }
-.muscle-glutes { color: #F472B6; background: rgba(244, 114, 182, 0.15); }
+/* Muscle group colors — legible on white and #f5f5f5 */
+.muscle-chest     { color: #e53e3e; background: rgba(229, 62,  62,  0.10); }
+.muscle-back      { color: #2c9a93; background: rgba(44,  154, 147, 0.10); }
+.muscle-legs      { color: #b45309; background: rgba(180, 83,  9,   0.10); }
+.muscle-shoulders { color: #6d28d9; background: rgba(109, 40,  217, 0.10); }
+.muscle-arms      { color: #c2410c; background: rgba(194, 65,  12,  0.10); }
+.muscle-core      { color: #047857; background: rgba(4,   120, 87,  0.10); }
+.muscle-glutes    { color: #be185d; background: rgba(190, 24,  93,  0.10); }
 
 /* RIR color coding */
-.rir-hard { color: var(--red); }
-.rir-moderate { color: #FFE66D; }
-.rir-easy { color: #6EE7B7; }
+.rir-hard     { color: #dc2626; }
+.rir-moderate { color: #b45309; }
+.rir-easy     { color: #047857; }
