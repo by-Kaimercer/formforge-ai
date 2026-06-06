@@ -61,10 +61,11 @@ export async function chatWithCoach(
   profileContext: string,
   programContext: string
 ): Promise<string> {
-  const systemMessage = `${SYSTEM_PROMPT_CHAT}\n\n--- USER PROFILE ---\n${profileContext}\n\n--- CURRENT PROGRAM ---\n${programContext}`;
+  const systemMessage = `${SYSTEM_PROMPT_CHAT}\n\n${profileContext}\n\n${programContext}`;
   return openRouterChat(
     [{ role: "system", content: systemMessage }, ...messages],
-    { temperature: 0.7, max_tokens: 2000 }
+    // Higher token limit: system prompt now includes full program exercise data
+    { temperature: 0.72, max_tokens: 3000 }
   );
 }
 

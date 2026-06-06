@@ -20,6 +20,14 @@ export default function ChatPage() {
   }, [messages]);
 
   useEffect(() => {
+    // Always load from sessionStorage first (covers demo + returning users)
+    const storedProgram = sessionStorage.getItem("ff_program");
+    if (storedProgram) setActiveProgram(JSON.parse(storedProgram));
+
+    const storedProfile = sessionStorage.getItem("ff_profile");
+    if (storedProfile) setProfile(JSON.parse(storedProfile));
+
+    // Then try to upgrade with live Supabase data if logged in
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return;
@@ -31,20 +39,17 @@ export default function ChatPage() {
         .eq("is_active", true)
         .single();
 
-      if (programRow) {
+      if (programRow?.program_json) {
         setActiveProgram(programRow.program_json as ProgramJSON);
-      } else {
-        const stored = sessionStorage.getItem("ff_program");
-        if (stored) setActiveProgram(JSON.parse(stored));
       }
 
       const { data: profileRow } = await supabase
-        .from("user_profiles")
+        .from("profiles")
         .select("*")
-        .eq("user_id", data.user.id)
+        .eq("id", data.user.id)
         .single();
 
-      if (profileRow) setProfile(profileRow as Profile);
+      if (profileRow) setProfile(profileRow as unknown as Profile);
     });
   }, []);
 
