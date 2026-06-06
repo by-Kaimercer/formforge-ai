@@ -116,16 +116,28 @@ body {
   opacity: 1;
 }
 
-/* Force light-mode colors on all form elements (prevents OS dark-mode override) */
+/* Force light-mode colors on all form elements — overrides OS dark-mode and WebKit autofill */
 input,
 textarea,
 select {
-  color: #111111;
-  background-color: #ffffff;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+  background-color: #ffffff !important;
+  caret-color: #111111;
+}
+/* Autofill override — Chrome/Edge set a blue tint that can hide text */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111111 !important;
+  -webkit-box-shadow: 0 0 0 40px #ffffff inset !important;
+  caret-color: #111111;
 }
 input::placeholder,
 textarea::placeholder {
-  color: #9ca3af;
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
   opacity: 1;
 }
 
